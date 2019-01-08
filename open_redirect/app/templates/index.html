@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Open Redirect</title>
+</head>
+<body>
+<p>Hello! Let's try to exploit open redirect.</p>
+<p>Unsafe:</p>
+<form action="/redirect">
+    <p><input name="url"></p>
+    <p><input type="submit"></p>
+</form>
+
+<p>Safe:</p>
+<form action="/safe_redirect">
+    <p><input name="url"></p>
+    <p><input type="submit"></p>
+</form>
+
+</body>
+</html>
