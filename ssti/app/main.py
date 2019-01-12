@@ -2,7 +2,6 @@ from flask import Flask, request, redirect, render_template, render_template_str
 
 app = Flask(__name__)
 
-
 @app.route("/")
 def hello():
 
@@ -12,12 +11,14 @@ def hello():
 @app.route("/unsafe")
 def unsafe_ssti():
 
+	person = {'name': 'world!', 'secret': 'You win, master jedi!'}
+
 	try:
-		name = request.args['whoami']
+		person['name'] = request.args['whoami']
 
-		body = "Name: %s" % name
+		body = "Name: %s" % person['name']
 
-		return render_template_string(body)
+		return render_template_string(body, person=person)
 
 	except KeyError:
 
