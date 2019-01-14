@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CRLF</title>
+</head>
+<body>
+<p>Hello! Let's try to exploit CRLF.</p>
+<p>Try it:</p>
+<form action="/get_headers">
+    <p><input name="value"></p>
+    <p><input type="submit"></p>
+</form>
+
+<p>Your cookies:</p>
+{% for c in cookie %}
+<p>{{ c | safe }}:{{ cookie[c] | safe }}</p>
+{% endfor %}
+
+</body>
+</html>

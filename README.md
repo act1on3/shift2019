@@ -63,3 +63,6 @@ Close all containers:
 Remove images:
 - `docker images`
 - `docker image rm <image_name>`
+
+Remove None images (create while building):
+- ```docker rmi `docker images -f "dangling=true" -q` ```
