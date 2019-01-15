@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Settings status</title>
+</head>
+<body>
+Settings:
+{% if is_changed %}
+<b>changed</b>
+{% else %}
+not changed
+{% endif %}
+
+<script>
+window.setTimeout(function(){
+window.location.replace("/");
+}, 1000);
+</script>
+
+</body>
+</html>

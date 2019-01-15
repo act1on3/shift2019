@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User cabinet</title>
+</head>
+<body>
+<p>Hello {{user['username']}}!</p>
+<p>Your status: <b>{{user['status']}}</b></p>
+
+<br>
+<p>Change settings 1st type:</p>
+<p>
+    <form method="get" action="change_settings_1">
+        <p><input type=hidden value="false" name=settings>
+        <p><input type=submit value=Off>
+    </form>
+    <form method="get" action="change_settings_1">
+        <p><input type=hidden value="true" name=settings>
+        <p><input type=submit value=On>
+    </form>
+</p>
+<br>
+<p>Change settings 2nd type:</p>
+<p>
+    <form method="post" action="change_settings_2">
+        <p><input type=hidden value="false" name=settings>
+        <p><input type=submit value=Off>
+    </form>
+    <form method="post" action="change_settings_2">
+        <p><input type=hidden value="true" name=settings>
+        <p><input type=submit value=On>
+    </form>
+</p>
+</body>
+</html>
