@@ -13,16 +13,14 @@ def hello():
 @app.route("/get_headers", methods=['GET'])
 def crlf():
 
-	try:
-		val = request.args['value']
+	val = request.args.get('value')
 
-	except (KeyError, TypeError):
+	if val is None:
 		val = 'test'
 
-	else:
-		resp = make_response('Check response headers', 200)
-		resp.headers['TEST'] = val
-		return resp
+	resp = make_response('Check response headers', 200)
+	resp.headers['TEST'] = val
+	return resp
 
 
 if __name__ == '__main__':

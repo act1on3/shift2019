@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template, render_template_string
+from flask import Flask, request, render_template, render_template_string
 
 app = Flask(__name__)
 
@@ -12,31 +12,25 @@ def hello():
 @app.route("/unsafe")
 def unsafe_ssti():
 
-	person = {'name': 'world!', 'secret': 'You win, master jedi!'}
+	person = {'name': request.args.get('whoami'), 'secret': 'You win, master jedi!'}
 
-	try:
-		person['name'] = request.args['whoami']
+	if person['name'] is None:
+		person['name'] = 'world!'
 
-		body = "Name: %s" % person['name']
+	body = "Name: %s" % person['name']
 
-		return render_template_string(body, person=person)
-
-	except KeyError:
-
-		return 'Try again'
+	return render_template_string(body, person=person)
 
 
 @app.route("/safe")
 def safe_ssti():
 
-	try:
-		name = request.args['whoami']
+	name = request.args.get('whoami')
 
-		return render_template('safe.html', name=name)
+	if name is None:
+		name = 'world!'
 
-	except KeyError:
-
-		return 'Try again'
+	return render_template('safe.html', name=name)
 
 
 if __name__ == '__main__':

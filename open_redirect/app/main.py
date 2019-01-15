@@ -16,11 +16,7 @@ def hello():
 @app.route("/redirect", methods=['GET'])
 def open_redirect():
 
-	try:
-		url = request.args['url']
-
-	except KeyError:
-		url = None
+	url = request.args.get('url')
 
 	if url is None:
 		return redirect(url_for('hello'))
@@ -32,11 +28,7 @@ def open_redirect():
 @app.route("/safe_redirect", methods=['GET'])
 def safe_redirect():
 
-	try:
-		url = request.args['url']
-
-	except KeyError:
-		url = None
+	url = request.args.get('url')
 
 	if url is None:
 		return redirect(url_for('hello'))

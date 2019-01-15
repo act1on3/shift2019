@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template, render_template_string
+from flask import Flask, request, render_template
 import pycurl
 from io import BytesIO
 
@@ -16,25 +16,28 @@ def hello():
 @app.route("/get_url")
 def get_url():
 
-	try:
-		url = request.args['url']
+	url = request.args.get('url')
 
-		curl_wrap = pycurl.Curl()
+	if url is None:
+		url = 'https://ya.ru'
 
-		buffer = BytesIO()
+	# prepare curl
+	curl_wrap = pycurl.Curl()
 
-		curl_wrap.setopt(curl_wrap.URL, url)
-		curl_wrap.setopt(curl_wrap.WRITEDATA, buffer)
+	# prepare buffer for curl output
+	buffer = BytesIO()
 
-		curl_wrap.perform()
+	# settings for curl: url and output
+	curl_wrap.setopt(curl_wrap.URL, url)
+	curl_wrap.setopt(curl_wrap.WRITEDATA, buffer)
 
-		info = buffer.getvalue()
+	# let's go!
+	curl_wrap.perform()
 
-		return render_template('result.html', info=info.decode())
+	# get output
+	info = buffer.getvalue()
 
-	except KeyError:
-
-		return 'Try again'
+	return render_template('result.html', info=info.decode())
 
 
 @app.route("/secret")
@@ -46,12 +49,8 @@ def secret():
 
 		is_secret_view = False
 
-		try:
-			if request.args['show_me_secrets'] == 'true':
-				is_secret_view = True
-
-		except KeyError:
-			pass
+		if request.args.get('show_me_secrets') == 'true':
+			is_secret_view = True
 
 		return render_template('secret.html', ip=ip, is_secret_view=is_secret_view)
 

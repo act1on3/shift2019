@@ -24,6 +24,7 @@ def close_connection(exception):
 		db.close()
 
 
+# get user from db
 def get_user(username):
 	cur = get_db().execute('SELECT * FROM users WHERE username=?', [username])
 	user = cur.fetchone()
@@ -33,6 +34,7 @@ def get_user(username):
 	return user
 
 
+# update status in db
 def update_status(new_status, username):
 	cur = get_db().execute('UPDATE users SET status=? WHERE username=?', [new_status, username])
 	cur.close()
@@ -40,6 +42,7 @@ def update_status(new_status, username):
 	return True
 
 
+# change settings in db
 def change_settings(new_settings, username):
 	is_changed = False
 
