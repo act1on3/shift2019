@@ -14,7 +14,7 @@
 2) Отправляем мне в телеграмм свой никнейм на Github (или линк на Github)
 3) Я добавляю вас в контрибьюторы проекта, вы сможете вносить изменения
 4) Клонируем репозиторий
-5) Создаем директорию с названием уязвимости (используем lowercase и `_` вместо пробелов, например `jwt_insecure`)
+5) Переходим (создаем) в директорию с названием уязвимости (если создаем, то используем lowercase и `_` вместо пробелов, например `jwt_insecure`)
 6) Переключаемся на новую ветку. Имя ветки лучше выбрать такое же, как и директорию
 7) Копируем шаблон `../example/README.md` в свою рабочую директорию
 8) Используем директорию, редактируем `README.md`, ресерчим!
@@ -173,3 +173,10 @@
 ### PHP Type Juggling
 - Описание, таблицы, примеры багов: https://www.owasp.org/images/6/6b/PHPMagicTricks-TypeJuggling.pdf
 - Информация об эксплуатации: https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/PHP%20juggling%20type
+
+### Deserialization
+- Ресерч десериализация в Java: https://github.com/mbechler/marshalsec/blob/master/marshalsec.pdf
+- Шпаргалка от OWASP: https://www.owasp.org/index.php/Deserialization_Cheat_Sheet#Guidance_on_Deserializing_Objects_Safely
+- Шпаргалка от GrrrDog: https://github.com/GrrrDog/Java-Deserialization-Cheat-Sheet
+- Уязвимые приложения (Python, nodejs, Java (native binary and jackson)): https://github.com/GrrrDog/ZeroNights-WebVillage-2017
+- Ресерч по десериализации в Ruby: https://lab.wallarm.com/exploring-de-serialization-issues-in-ruby-projects-801e0a3e5a0a

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+</head>
+<body>
+Hello!
+{% if isLoggedIn %}
+Great!
+<p>Your info: </p>
+<p>Username: {{result['username']}}</p>
+<p>Admin: {{result['is_admin']}}</p>
+{% else %}
+<p>We have error: {{result}}</p>
+<p>Try to <a href="/login">login</a> </p>
+{% endif %}
+<p>{{additional}}</p>
+</body>
+</html>

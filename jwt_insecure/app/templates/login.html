@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    {% if not isCorrect %}
+    <strong>Bad user and pass</strong>
+    {% endif %}
+    <form method="post">
+        <p><input type=text name=username>
+        <p><input type=password name=password>
+        <p><input type=submit value=Login>
+    </form>
+    <p>Psss, guys. We have default: user:pass</p>
+</head>
+<body>
+
+</body>
+</html>
