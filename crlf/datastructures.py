@@ -1168,6 +1168,7 @@ class Headers(object):
     def _validate_value(self, value):
         if not isinstance(value, text_type):
             raise TypeError('Value should be unicode.')
+        # SHIFT: change here exception with testing CRLF
         # if u'\n' in value or u'\r' in value:
             # raise ValueError('Detected newline in header value.  This is '
                              # 'a potential security problem')

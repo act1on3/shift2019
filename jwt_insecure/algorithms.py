@@ -139,6 +139,7 @@ class HMACAlgorithm(Algorithm):
     def prepare_key(self, key):
         key = force_bytes(key)
 
+        # SHIFT: change here list of invalid strings
         invalid_strings = []
 
         if any([string_value in key for string_value in invalid_strings]):

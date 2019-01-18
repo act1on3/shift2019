@@ -154,7 +154,8 @@
 - Статья с описанием от albinowax: https://portswigger.net/blog/server-side-template-injection
 - Ресерч, пэйлоады и др: https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/Server%20Side%20Template%20injections
 - Статья с описанием от defcon.ru: https://defcon.ru/web-security/3840/
-- Описание SSTI во Flask: https://nvisium.com/blog/2015/12/07/injecting-flask.html
+- Статьи с описанием SSTI во Flask: https://nvisium.com/blog/2015/12/07/injecting-flask.html https://nvisium.com/blog/2016/03/11/exploring-ssti-in-flask-jinja2-part-ii.html
+- Инструмент для автоматической эксплуатации: https://github.com/epinna/tplmap
 
 ### CSRF
 - Интерактивный урок: https://www.hacksplaining.com/exercises/csrf
@@ -166,7 +167,7 @@
 
 ### JWT insecure
 - Описание проблем технологии: https://www.slideshare.net/snyff/jwt-insecurity
-- Потестировать технологию: https://jwt.io/
+- Потестировать токены: https://jwt.io/
 - Шпаргалка с чек-листом для тестирования: https://assets.pentesterlab.com/jwt_security_cheatsheet/jwt_security_cheatsheet.pdf
 - Описание, информация: https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/JSON%20Web%20Token
 
