@@ -148,6 +148,7 @@
 - XSS через CRLF на hackerone: https://vulners.com/hackerone/H1:192749
 - Пример репорта баги: Google Dork `site:hackerone.com crlf`
 - Шпаргалка от EdOverflow: https://github.com/EdOverflow/bugbounty-cheatsheet/blob/master/cheatsheets/crlf.md
+- CRLF to XSS: https://habr.com/ru/company/pt/blog/247709/
 - Дополнительная информация: https://2017.zeronights.org/wp-content/uploads/materials/ZN17_Karbutov_CRLF_PDF.pdf
 
 ### SSRF

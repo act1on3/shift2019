@@ -1,5 +1,6 @@
 from flask import Flask, request, render_template
 import pycurl
+import requests
 from io import BytesIO
 
 app = Flask(__name__)
@@ -13,8 +14,8 @@ def hello():
 	return render_template('index.html', ip=ip)
 
 
-@app.route("/get_url")
-def get_url():
+@app.route("/get_url_curl")
+def get_url_curl():
 
 	url = request.args.get('url')
 
@@ -36,8 +37,22 @@ def get_url():
 
 	# get output
 	info = buffer.getvalue()
+	info = info.decode()
 
-	return render_template('result.html', info=info.decode())
+	return render_template('result.html', info=info)
+
+
+@app.route("/get_url_requests")
+def get_url_requests():
+
+	url = request.args.get('url')
+
+	if url is None:
+		url = 'https://ya.ru'
+
+	info = requests.get(url).text
+
+	return render_template('result.html', info=info)
 
 
 @app.route("/secret")
