@@ -22,16 +22,5 @@ def unsafe_ssti():
 	return render_template_string(body, person=person)
 
 
-@app.route("/safe")
-def safe_ssti():
-
-	name = request.args.get('whoami')
-
-	if name is None:
-		name = 'world!'
-
-	return render_template('safe.html', name=name)
-
-
 if __name__ == '__main__':
 	app.run(host='0.0.0.0', debug=True, port=80)
