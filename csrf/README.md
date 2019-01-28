@@ -13,7 +13,7 @@
 - Описание, защита - https://2017.zeronights.org/wp-content/uploads/materials/csrf_cors_etc.pdf
 
 ## Общая информация
-###Уязвимость
+
 
 
 
