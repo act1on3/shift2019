@@ -12,6 +12,8 @@
 - Описание, обход, эксплуатация: https://2017.zeronights.org/wp-content/uploads/materials/ZN17_MikhailEgorov%20_Neat_tricks_to_bypass_CSRF_protection.pdf
 - Описание, защита - https://2017.zeronights.org/wp-content/uploads/materials/csrf_cors_etc.pdf
 
+### Общая информация
+##Уязвимость
 
 
 
