@@ -1,5 +1,12 @@
 # Тут писать свой ресерч
 
+# Уязвимости
+
+1. Неподписанный JSON запрос (Поддерживается отправка запроса без подписи. Это позволяет менять содержимое payload)
+2. Изменение алгоритма подписи с RS256 на HS256
+3. Возможность сбрутить secret key 
+ 
+
 # Unverified token problem
 
 JWT токен состоит из 3 частей: Header, Payload, Signature. Signature - это подпись, которая вычисляется на основании Header и Payload и зависит от выбранного алгоритма.
@@ -194,4 +201,38 @@ result = jwt.decode(session, key=jwt_secret, verify=True)
 result = jwt.decode(session, key=jwt_secret)
 
 ```
+
+
+# Изменение алгоритма подписи с RS256 на HS256 
+
+Алгоритм HS256 использует secret key, чтобы подписать и проверить каждой сообщение. Алгоритм RS256 испльзует private key для подписи и public key для авторизации.
+
+Если изменить RS256 на HS256, сервер будет использовать public key в качестве secret key, а затем использовать HS256 для верификации сигнатуры. 
+
+Так как иногда можно получить public key, можно изменить  алгоритм в header на HS256 и затем подписать public ключом алгоритмом RSA. 
+
+Сервер проверит RSA public key + HS256. 
+
+## Эксплуатация 
+
+### Шаг1 
+
+Идем на /index_2, получаем 
+
+```
+LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlHZk1BMEdDU3FHU0liM0RRRUJBUVVBQTRHTkFEQ0JpUUtCZ1FERk44dDdhS1UxbmQ2K1RQYkZFWVJmenIzWApnSE1QZGdzdVZ1c3MrL1UwMjNtRW1vajJ4Zy9lamR0V0UwTWJRUUxkT28rOXlqZmRNbWowYy9NbGYrYXF0M1lPCkNkUWtVV0l1RFZUOVVPTnRBUkFtYWNxQzNQT0xBNXgrcEIyc0ZieWNhT2ZQS2xYV3I2RXZVd2V0TW1PaWNuR1YKeGwrMEIwZDhid1d3TldPV0p3SURBUUFCCi0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=
+```
+
+Это base64 от ключа. Расшифровываем: https://pastebin.com/16EBZmJf
+``` 
+-----BEGIN PUBLIC KEY-----
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDFN8t7aKU1nd6+TPbFEYRfzr3X
+gHMPdgsuVuss+/U023mEmoj2xg/ejdtWE0MbQQLdOo+9yjfdMmj0c/Mlf+aqt3YO
+CdQkUWIuDVT9UONtARAmacqC3POLA5x+pB2sFbycaOfPKlXWr6EvUwetMmOicnGV
+xl+0B0d8bwWwNWOWJwIDAQAB
+-----END PUBLIC KEY-----
+```
+
+
+
 
