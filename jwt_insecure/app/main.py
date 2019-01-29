@@ -113,7 +113,7 @@ def index_2():
 
 
 @app.route("/index_3", methods=['GET'])
-def index():
+def index_3():
     session = request.cookies.get('session')
     isLoggedIn = False
 
