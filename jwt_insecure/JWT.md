@@ -229,9 +229,9 @@ eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJ1c2VybmFtZSI6InVzZXIiLCJpc19hZG1pbiI6ZmFs
 ![](img/utp_5.png)
 
 
-## Fix
+## Как это работает
 
-При преходе по адресу http://jwt_insecure.lab/index_1 управление передается в jwt_insecure/app/main.py в функцию index_1 (index_3)
+При преходе по адресу http://jwt_insecure.lab/index_1 управление передается в jwt_insecure/app/main.py в функцию index_1
 
 ```python
 # jwt_insecure/app/main.py
@@ -252,8 +252,12 @@ def index_1():
 		result = ''
 
 	return render_template('index_login.html', isLoggedIn=isLoggedIn, result=result)
+```
 
+Для http://jwt_insecure.lab/index_3 управление передается в jwt_insecure/app/main.py в функцию index_3
 
+```python
+# jwt_insecure/app/main.py
 @app.route("/index_3", methods=['GET'])
 def index_3():
     session = request.cookies.get('session')
@@ -272,8 +276,6 @@ def index_3():
 
     return render_template('index_login.html', isLoggedIn=isLoggedIn, result=result)
 ```
-
-Как это работает?
 
 Посмотрим на функцию decode из pyjwt/jwt/api_jwt.py
 
@@ -310,10 +312,9 @@ def index_3():
         # ...
 ```
 
-В decode происходит вызов функции, в которой проверяется JWT подпись. 
 Если verify_signature равен False, то проверка подписи не производится. Таким образом возможна эксплуатация Unverified token problem.
 
-В случае когда верификая производится, происходит вызов _verify_signature
+В случае когда производится проверка JWT подписи, происходит вызов _verify_signature
 
 ```python
     # pyjwt/jwt/api_jws.py
@@ -325,6 +326,7 @@ def index_3():
             raise InvalidAlgorithmError('The specified alg value is not allowed')
 
         try:
+            # экземпляр класса из jwt_insecure/algorithms.py
             alg_obj = self._algorithms[alg]
             # вызов prepare_key для соответствуюшего класса из jwt_insecure/algorithms.py
             key = alg_obj.prepare_key(key)
@@ -339,7 +341,7 @@ def index_3():
 ```
 
 В переменной alg_obj будет экземпляр класса из jwt_insecure/algorithms.py, в данном случае NoneAlgorithm, для которого
-будут вызвыны функции prepare_key и verify
+будут вызваны функции prepare_key и verify
 
 ```python
     # jwt_insecure/algorithms.py
@@ -358,17 +360,7 @@ def index_3():
         return True
 ```
 
-Как видно, основное требование к ключу - это его отсутсвие. И любой токен с алгоритмом подписи none является валидным.
-
-В результате, для того чтобы исправит данную уязвимость необходимо в jwt_insecure/app/main.py при вызове 
-jwt.decode передать параметр verify со значением True
-
-```python
-result = jwt.decode(session, key=jwt_secret, verify=True)
-# или
-result = jwt.decode(session, key=jwt_secret)
-
-```
+Как видно, если отсутсвует ключ и алгоритм подписи токена - none, то он является валидным.
 
 # Изменение алгоритма подписи с RS256 на HS256 
 
