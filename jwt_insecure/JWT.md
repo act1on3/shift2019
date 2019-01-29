@@ -467,3 +467,12 @@ print(jwt.encode({'username': 'user', 'is_admin': True}, # изменяем зн
 
 1. https://medium.com/101-writeups/hacking-json-web-token-jwt-233fe6c862e6
 2. https://nandynarwhals.org/hitbgsec2017-pasty/
+
+
+# Bruteforce
+
+```bash
+python2 jwt_tool.py eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InVzZXIiLCJpc19hZG1pbiI6ZmFsc2V9.r2JjnalFCyz14WuyIukEpocbfoNcO9HcV-28TUHgSvc /tmp/wl.txt
+```
+
+![](img/brute_1.png)
