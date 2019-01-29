@@ -503,7 +503,7 @@ eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6IjN2MWxINHh4MHIiLCJpc19hZG1
 
 Используем сгенерированный JWT токен:
 
-![](img/brute_2.png)
+![](img/brute_2.PNG)
 
 
 # Добавление ключа на сервер
