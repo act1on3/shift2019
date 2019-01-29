@@ -13,6 +13,9 @@
 - Описание, защита - https://2017.zeronights.org/wp-content/uploads/materials/csrf_cors_etc.pdf
 
 ## Общая информация
+# Описание
+
+CSRF - подделка межсайтовых запросов, другими словами, это атака при которой хакер выполняет массу различных действий от имени других, зарегистрированных посетителей.
 
 
 
@@ -24,6 +27,8 @@
 - шпаргалка по синтаксису есть [тут](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
 - лучше использовать удобный текстовый редактор (я использую [Sublime Text](https://www.sublimetext.com/))
 - лучше в текстовом редакторе поставить плагин для предпроссмотра Markdown-файлов (я использую [этот](https://packagecontrol.io/packages/MarkdownPreview))
+
+
 
 
 
