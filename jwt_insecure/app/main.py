@@ -119,7 +119,7 @@ def index_3():
 
     if session is not None:
         try:
-            result = jwt.decode(session)
+            result = jwt.decode(session, key=jwt_secret)
             isLoggedIn = True
 
         except Exception as err:

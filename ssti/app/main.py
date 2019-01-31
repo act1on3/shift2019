@@ -19,6 +19,19 @@ def unsafe_ssti():
 
 	body = "Name: %s" % person['name']
 
+	return render_template_string(body)
+
+
+@app.route("/safe")
+def safe_ssti():
+
+	person = {'name': request.args.get('whoami'), 'secret': 'You win, master jedi!'}
+
+	if person['name'] is None:
+		person['name'] = 'world!'
+
+	body = "Name: {{person['name']}}"
+
 	return render_template_string(body, person=person)
 
 
