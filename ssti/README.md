@@ -135,10 +135,19 @@ id;ls;echo "im knockie, im winner!" >> hacked.txt; cat hacked.txt
   
   ## Защита(?)
   ### Основные меры
-  Имя может состоять только из букв латинского алфавита. Изменяем исходный код таким образом, чтобы игнорировать ненужные символы.  
+  #### Вариант 1. Регулярные выражения
+  Для данного метода считается, что имя может состоять только из букв латинского алфавита. Изменяем исходный код таким образом, чтобы игнорировать ненужные символы.  
   Исходный код:
-  ![code](https://pp.userapi.com/c849132/v849132289/1166bd/K_7su5Rg3Kk.jpg)  
-  
+  ```python
+  @app.route("/safe")
+  def safe_ssti():
+        person = {'name': request.args.get('whoami')}
+
+        if person['name'] is None:
+                 person['name'] = 'world!'
+        body = 'True name: %s' % re.sub('[^A-Za-z]', '', person['name'])
+        return body
+  ```
   Проверка работоспособности:  
   
   ![fil](https://pp.userapi.com/c849132/v849132289/1166a4/T8wirzD24kA.jpg)  
@@ -147,3 +156,70 @@ id;ls;echo "im knockie, im winner!" >> hacked.txt; cat hacked.txt
   
   ![tplm](https://pp.userapi.com/c849132/v849132289/1166c6/oNOZ7f7LDN8.jpg)  
   
+  Однако, возможен такой случай, что разработчику необходимо принимать символы помимо букв латинского алфавита.  
+  #### Вариант 2. Строка шаблона 
+  ```python
+  @app.route("/truesafe")
+  def truesafe_ssti():
+
+        person = {'name': request.args.get('whoami'), 'secret': 'You win, master jedi!'}
+
+        if person['name'] is None:
+                person['name'] = 'world!'
+
+        body = "Name:  {{person['name']}}"
+
+        return render_template_string(body, person=person)
+  ```
+  В данном варианте поле body тсановится неизменяеемым для юзера.
+  Проверка работоспособности:
+  
+  ![true](https://pp.userapi.com/c845417/v845417354/18ffc9/nNppoB7fhC4.jpg)
+  
+  Проверка работоспособности через tplmap:
+  
+  ![tplm2](https://pp.userapi.com/c845417/v845417354/18ffea/We5WV4lbfM4.jpg)
+  
+## Внешний вид
+
+#### Разработанные модули и графические средства с целью улучшения внешнего вида и удобства:
+* статичный дизайн — да
+* анимация — да
+* перечень возможностей приложения(безопасный и небезопасный методы)
+
+Используемое решение по созданию дизайна сайта:
+#### Стартовая страница:
+* иллюстрирует направления деятельности (или конкретные работы) приложения
+* имеет структуру, собранную из 3 информационных блока: баннеры перехода на форму(2 безопасных и небезопасную). Все блоки одного размера. В будущем возможно расширение и обновление сайта путем замены одного блока на другие.
+
+Файл `index.html`
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="static/favicon.ico" type="image/x-icon">
+    <meta charset="UTF-8">
+    <title>SSTI</title>
+</head>
+  <style>
+   h1 {
+    font-family: Impact, Charcoal, sans-serif;
+    font-size: 500%;
+   }
+   p {
+    font-family: Segoe Script;
+    font-size: 250%;
+   }
+  </style>
+<body bgcolor="#fff" background="{{ url_for('static',filename="back.jpg")}}"">
+<div style="position:absolute; top:10%; left:43%">
+<center><h1>SSTI</h1>
+<p>Unsafe: <a href="unsafe?whoami=Ronnie">link</a></p>
+<p>Safe: <a href="safe?whoami=Ronnie">link</a></p>
+<p>True safe: <a href="truesafe?whoami=Ronnie">link</a></p>
+<img src="static/1.gif" alt=""></div></center>
+</body>
+</html>
+```
+Стартовая страница: 
+![start](https://pp.userapi.com/c845417/v845417354/19002f/h_5HR4vvBUk.jpg)
