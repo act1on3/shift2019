@@ -417,6 +417,7 @@ session_rsa=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1c2VybmFtZSI6InVzZXIiLCJpc19
 Для генерации нового session_rsa cookie подписанной public ключом, используя код:
 
 ```python
+# important: pyjwt version <= 0.4.2
 import jwt
 
 file = open('public.pem', 'r').read() # public key
