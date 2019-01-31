@@ -22,7 +22,18 @@ SSRF - уязвимость, позволяющая злоумышленнику
 Способ 2: Burp Suite Collaborator
 
 С помощью сервера колаборатора можно убедится в том, что запросы проходят по удалённому веб-серверу.
+Нужно скопировать payload, который был сгенерирован коллаборатором, нажав: Copy to Clipboard
+
+![Image alt](https://github.com/lifeskipp/shift2019/raw/master/ssrf/images/2_2_copy.png)
+
+Затем payload нужно вставить в уязвимый параметр (в нашем случае url). 
+
+![Image alt](https://github.com/lifeskipp/shift2019/raw/master/ssrf/images/2_3_paste.png)
+
+Уязвимый сервер отравил запросы DNS и HTTP
+
 ![Image alt](https://github.com/lifeskipp/shift2019/raw/master/ssrf/images/2_collab.png)
+
 Это подтверждает наличие уязвимости.
 
 ## Эксплуатация
@@ -47,8 +58,7 @@ http://localhost/
 - Получаем доступ к админке
 
 Так как у нас есть исходный код, мы можем заметить в нём интересные детали, а именно:
-```
-//python code
+```python
 @app.route("/secret")
 def secret():
 
@@ -66,13 +76,13 @@ def secret():
 	else:
 		return 'Forbidden', 403
 ```
-Здесь видно, что мы довольно легко можем получить доступ к админке.
+Здесь видно, что мы довольно легко можем получить доступ к админке, изменив url на: http://127.0.0.1/secret?show_me_secrets=true
 ![Image alt](https://github.com/lifeskipp/shift2019/raw/master/ssrf/images/4_admin.png)
 
 
-
 скан сети
-облачные API
+
+Если у сервера есть доступ к облачному API, то можно спровоцировать его на отправку произвольных реквестов, а так же осуществить RCE.
 
 
 
