@@ -3,10 +3,51 @@
   
   ## Описание
   Есть такой вид атак, как Template Injection (Внедрение шаблона). Данный вид атак делится на два вида: Server Side Template Injection (SSTI) и Client Side Template Injection(CSTI). То есть шаблонизаторы (в вебе) используются для того, чтобы отделить HTML код (представление данных) от кода языка. Шаблон – это файл, содержащий HTML и некоторые маркеры, позволяющий этот шаблон обработать и сформировать на его основе конечный HTML код.
-  Из-за чего возникают уязвимость SSTI? Конечно же, из-за неверной обработки пользовательских данных.
+  Уязвимость возникает из-за неверной обработки пользовательских данных.
   
   ## Классификация
-  Классифицируются по шаблонизаторам: Smarty, Mako, Twig, and Jinja2.
+  Классифицируются по используемым шаблонизаторам:
+#### Java:
+Apache Velocity  
+FreeMarker  
+Histone  
+#### PHP:
+Возможности самого языка PHP  
+BH  
+Fenom  
+Smarty  
+Twig  
+TinyButStrong  
+XTemplate  
+Histone  
+Separate  
+Blade  
+Sigma  
+PHPTAL  
+Facebook XHP  
+dwoo  
+Blitz templates  
+#### Python:
+Genshi  
+Kid  
+Jinja2  
+Mako  
+#### Perl:
+Template Toolkit  
+HTML::Template  
+#### Ruby/Rails:
+eRuby  
+Erubis  
+Haml  
+Slim  
+Liquid  
+#### JavaScript:
+bem-xjst  
+BH  
+Handlebars  
+Underscore  
+pug  
+Histone  
   
   ## Условия
   - ОС: любая
