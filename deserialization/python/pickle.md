@@ -1,14 +1,17 @@
+# Deserialization (Python) 
 
-# Ссылки
+# Описание
 
-Docker container: https://github.com/GrrrDog/ZeroNights-WebVillage-2017/tree/master/pydeser
+Сериализация -- процесс перевода какой-либо структуры данных в последовательность бит, пригодную для хранения в файлах или передачи данных по сети. Десериализация -- процесс восстановления начального состояния структуры из последовательности. 
 
-Материалы:
-- https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Insecure%20deserialization/Python.md
-- https://docs.python.org/2/library/pickle.html#pickling-and-unpickling-extension-types
-- https://habr.com/ru/post/186608/
-- http://qaru.site/questions/1650451/how-reduce-function-exactly-works-in-case-of-pickle-module
-- https://github.com/f47h3r/exploit_code/blob/master/graphite_pickle_exploit.py
+# Уязвимость 
+
+В качестве объекта для сериализации можно записать пользовательские данные, которые могут вызвать выполнение методов из уязвимых библиотек. С помощью уязвимых библиотек можно выполнить произвольный код. При этом стоит учитывать, что можно сериализовать только данные, но не код.
+
+# Детектирование 
+
+
+
 
 # Уязвимый сервис
 
@@ -59,6 +62,23 @@ Y3N1YnByb2Nlc3MKY2hlY2tfb3V0cHV0CnAxCigoUydjYXQnCnAyClMnL2V0Yy9wYXNzd2QnCnAzCnRw
 
 ![](img/pickle_1.png)
 
+# Защита
+
+1. Не десериализовать объекты из недоверенных источников.
+2. Запретить пользователям загрузку объектов для десериализации.
+
 # Ущерб
 
-Получение RCE
+Подмена объекта десериализации потенциально может привести к удалённому выполнению кода на сервере.
+
+
+# Ссылки
+
+Docker container: https://github.com/GrrrDog/ZeroNights-WebVillage-2017/tree/master/pydeser
+
+Материалы:
+- https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Insecure%20deserialization/Python.md
+- https://docs.python.org/2/library/pickle.html#pickling-and-unpickling-extension-types
+- https://habr.com/ru/post/186608/
+- http://qaru.site/questions/1650451/how-reduce-function-exactly-works-in-case-of-pickle-module
+- https://github.com/f47h3r/exploit_code/blob/master/graphite_pickle_exploit.py
