@@ -4,6 +4,11 @@
 
 SSRF - уязвимость, позволяющая злоумышленнику спровоцировать сервер на отправку произвольных запросов от своего имени. Данная уязвимость появляется при возможности редактировании пользователем URL-адреса, при этом сервер делает запрос во внутреннюю сеть.
 
+## Классификация
+
+1. Basic - показывает ответ атакующему
+2. Blind - не показывает ответ 
+
 ## Условия
 
 - ОС: любая
@@ -97,10 +102,6 @@ def secret():
 
 ![Image alt](https://github.com/lifeskipp/shift2019/raw/master/ssrf/images/5_file.jpg)
 
-### Инструменты
-
-- Burp Suite  - с его помощью можем менять URL, который отправляет сервер, тем самым попадаем в локалхост.
-
 ## Ущерб
 
 Злоумышленник может отправлять запросы во внутреннюю сеть или подсеть, просканировать порты и саму сеть.
@@ -119,8 +120,6 @@ def secret():
 Вынести сервер, обрабатыващий URL в отдельный сегмент сети
 
 
-## Дополнительно
-Здесь приложить дополнительную информацию и источники, которые использовали, но не указали выше в других местах.
 
 ## Обход защиты
 - Сокращения
@@ -128,9 +127,15 @@ def secret():
 http://127.1/
 http://0/
 ```
+![Image alt](https://github.com/lifeskipp/shift2019/raw/master/ssrf/images/6_0.png)
+![Image alt](https://github.com/lifeskipp/shift2019/raw/master/ssrf/images/6_1.png)
+
 - Представление не в десятичной форме
 ```
 http://0177.1/
 http://0x7f.1/
 http://2130706433/
 ```
+![Image alt](https://github.com/lifeskipp/shift2019/raw/master/ssrf/images/6_2.png)
+![Image alt](https://github.com/lifeskipp/shift2019/raw/master/ssrf/images/6_3.png)
+![Image alt](https://github.com/lifeskipp/shift2019/raw/master/ssrf/images/6_4.png)
