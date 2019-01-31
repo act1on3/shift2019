@@ -35,6 +35,7 @@ CRLF-injection представляет собой тип атаки, испол
  - Обход Stateless-защиты от CSRF - проверка сервером значения cookie и заголовка
  - Proxy and web server cache poisoning
  - Client web browser poisoning
+
 Также стоит отметить тот факт, что CRLF может использоваться для фишинга.
 
 ## Защита
