@@ -27,7 +27,7 @@ CRLF-injection представляет собой тип атаки, испол
 Для выполнения данной операции введем в заголовке следующее:
 %0D%0ASet-Cookie:crlf_team=tanya_masha_denis_edik
 
-
+https://pp.userapi.com/c849128/v849128084/118ffa/skPDit0wgwc.jpg
 Рисунок 1. Запрос и ответ с добавление cookie
 
 
