@@ -1,12 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="icon" href="static/favicon.ico" type="image/x-icon">
     <meta charset="UTF-8">
     <title>SSTI</title>
 </head>
-<body>
-<h1>SSTI</h1>
+  <style>
+   h1 {
+    font-family: Impact, Charcoal, sans-serif;
+    font-size: 500%;
+   }
+   p {
+    font-family: Segoe Script;
+    font-size: 250%;
+   }
+  </style>
+<body bgcolor="#fff" background="{{ url_for('static',filename="back.jpg")}}"">
+<div style="position:absolute; top:10%; left:43%">
+<center><h1>SSTI</h1>
 <p>Unsafe: <a href="unsafe?whoami=Ronnie">link</a></p>
 <p>Safe: <a href="safe?whoami=Ronnie">link</a></p>
+<p>True safe: <a href="truesafe?whoami=Ronnie">link</a></p>
+<img src="static/1.gif" alt=""></div></center>
 </body>
 </html>
