@@ -24,11 +24,11 @@ SSRF - уязвимость, позволяющая злоумышленнику
 С помощью сервера колаборатора можно убедится в том, что запросы проходят по удалённому веб-серверу.
 Нужно скопировать payload, который был сгенерирован коллаборатором, нажав: Copy to Clipboard
 
-![Image alt](https://github.com/lifeskipp/shift2019/raw/master/ssrf/images/2_2_copy.png)
+![Image alt](https://github.com/lifeskipp/shift2019/raw/master/ssrf/images/2_2_copy.jpg)
 
 Затем payload нужно вставить в уязвимый параметр (в нашем случае url). 
 
-![Image alt](https://github.com/lifeskipp/shift2019/raw/master/ssrf/images/2_3_paste.png)
+![Image alt](https://github.com/lifeskipp/shift2019/raw/master/ssrf/images/2_3_paste.jpg)
 
 Уязвимый сервер отравил запросы DNS и HTTP
 
