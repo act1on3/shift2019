@@ -10,7 +10,7 @@
   
   ## Классификация
   Классифицируются по используемым шаблонизаторам:
-Уязвимы - smarty, mako, jinja2, twig и т.д
+Уязвимы - smarty, mako, jinja2, twig и т.д.  
 Неуязвимы - Mustache или Python's Template.
 
   
