@@ -82,7 +82,7 @@ id;ls;echo "im knockie, im winner!" >> hacked.txt; cat hacked.txt
   Результат запроса:
   ![cmd](https://pp.userapi.com/c849132/v849132517/112efd/tuUyVE4ZbU0.jpg)
   Однако, данные действия возможно автоматизировать, используя консольную утилиту `tplmap`:
-  ![tpl](https://pp.userapi.com/c849132/v849132517/112f27/l7Ak41yusFs.jpg)
+  ![tpl](https://pp.userapi.com/c849132/v849132517/112f27/l7Ak41yusFs.jpg)  
   С помощью данной утилиты также возможно захватить управление в реальном времени: 
   ![tpl2](https://pp.userapi.com/c849132/v849132517/112f47/7Pm6007VLf8.jpg)
   ### Инструменты
