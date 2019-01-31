@@ -4,8 +4,6 @@
 
 SSRF - уязвимость, позволяющая злоумышленнику спровоцировать сервер на отправку произвольных запросов от своего имени. Данная уязвимость появляется при возможности редактировании пользователем URL-адреса, при этом сервер делает запрос во внутреннюю сеть.
 
-
-
 ## Условия
 
 - ОС: любая
@@ -38,6 +36,35 @@ http://0.0.0.0/
 http://localhost/
 ```
 Обращение делаем с помощью Burp Suite
+![Image alt](https://github.com/lifeskipp/shift2019/raw/master/ssrf/images/3_localhost.png)
+
+-получаем доступ к админке
+
+Так как у нас есть исходный код, мы можем заметить в нём интересные детали, а именно:
+```
+//python code
+@app.route("/secret")
+def secret():
+
+	ip = request.remote_addr
+
+	if ip == '127.0.0.1':
+
+		is_secret_view = False
+
+		if request.args.get('show_me_secrets') == 'true':
+			is_secret_view = True
+
+		return render_template('secret.html', ip=ip, is_secret_view=is_secret_view)
+
+	else:
+		return 'Forbidden', 403
+```
+Здесь видно, что мы довольно легко можем получить доступ к админке.
+![Image alt](https://github.com/lifeskipp/shift2019/raw/master/ssrf/images/4_admin.png)
+
+
+
 скан сети
 облачные API
 
