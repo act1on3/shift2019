@@ -44,7 +44,7 @@ CRLF-injection представляет собой тип атаки, испол
 
 Рисунок 3. Реализации CRLF-инъекции для XSS
 
-![Результат получения XSS.png](https://github.com/karpuna3/shift2019/blob/master/crlf/img/Результат%20получения%20XSS.png)
+![](https://github.com/karpuna3/shift2019/blob/master/crlf/img/%D0%A1%D0%BD%D0%B8%D0%BC%D0%BE%D0%BA.PNG?raw=true)
 
 Рисунок 4. Результат получения XSS
 ### Замена информации полученной пользователем
