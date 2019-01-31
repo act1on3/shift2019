@@ -119,6 +119,11 @@ def secret():
 ### Превентивные меры
 Вынести сервер, обрабатыващий URL в отдельный сегмент сети
 
+## Дополнительно
+
+ Описание от DSec: https://dsec.ru/wp-content/uploads/2018/09/techtrain_ssrf.pdf  
+ Описание, пейлоады, техники: https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/Server%20Side%20Request%20Forgery
+
 
 
 ## Обход защиты
