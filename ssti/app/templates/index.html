@@ -18,9 +18,11 @@
 <body bgcolor="#fff" background="{{ url_for('static',filename="back.jpg")}}"">
 <div style="position:absolute; top:10%; left:43%">
 <center><h1>SSTI</h1>
-<p>Unsafe: <a href="unsafe?whoami=Ronnie">link</a></p>
-<p>Safe: <a href="safe?whoami=Ronnie">link</a></p>
-<p>True safe: <a href="truesafe?whoami=Ronnie">link</a></p>
+    <p>Unsafe: <a href="unsafe?whoami=Ronnie">link</a></p>
+    <p>Safe (re): <a href="re_safe?whoami=Ronnie">link</a></p>
+    <p>True safe: <a href="true_safe?whoami=Ronnie">link</a></p>
+    <p>Safe (Python Template): <a href="more_safe?whoami=Ronnie">link</a></p>
+    <p>Safe (Mustache Python): <a href="more_safe2?whoami=Ronnie">link</a></p>
 <img src="static/1.gif" alt=""></div></center>
 </body>
 </html>
