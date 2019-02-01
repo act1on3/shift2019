@@ -113,7 +113,9 @@ class NoneAlgorithm(Algorithm):
             key = None
 
         if key is not None:
-            raise InvalidKeyError('When alg = "none", key value must be None.')
+            # SHIFT: comment it and add pass to verify None algo
+            pass
+            # raise InvalidKeyError('When alg = "none", key value must be None.')
 
         return key
 
@@ -121,7 +123,7 @@ class NoneAlgorithm(Algorithm):
         return b''
 
     def verify(self, msg, key, sig):
-        return False
+        return True
 
 
 class HMACAlgorithm(Algorithm):
